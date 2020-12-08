@@ -6,7 +6,7 @@
 //#define DEBUG_MODE
 
 #define N_RCV_MAX 4000
-#define N_RCV_DEF 1024
+#define N_RCV_DEF 2000
 #define N_FLAG 16
 #define POS_CH1 2121
 #define POS_CH2 2135
@@ -129,7 +129,7 @@ volatile unsigned cnt_cycle_view = 0;
 volatile unsigned num_block_view = N_RCV_DEF;
 short before_val = 0;
 
-#define SIZE_DATA_CDG 	32
+#define SIZE_DATA_CDG 	100
 
 typedef struct
 {

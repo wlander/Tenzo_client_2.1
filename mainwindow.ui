@@ -737,7 +737,7 @@
           <item row="1" column="0">
            <widget class="QLineEdit" name="lineEdit_7">
             <property name="text">
-             <string>1024</string>
+             <string>2000</string>
             </property>
            </widget>
           </item>
@@ -781,7 +781,7 @@
           <item row="0" column="0">
            <widget class="QLineEdit" name="lineEdit_8">
             <property name="text">
-             <string>1000</string>
+             <string>2000</string>
             </property>
            </widget>
           </item>

@@ -53,7 +53,7 @@ void MyUDP::UDPRead()     //Read something
   
   outUDP(Buffer);
 
-  qDebug("data recieve!");
+  qDebug() << "data recieve! " << Buffer.size() <<"num: " << (unsigned int)(Buffer.data()[0]);
   //qDebug()<<"data: "<<Buffer.data();
 
 }

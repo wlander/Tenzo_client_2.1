@@ -233,6 +233,8 @@ void MainWindow::on_Button_Start_Stop_clicked()
   unsigned int sample_u;
   char* ptr_sample_u = (char*)&sample_u;
 
+//  Fl_SD_Ready = 1; //!!!
+
 if(Fl_SD_Ready){
     if(Fl_Start==false){
 
