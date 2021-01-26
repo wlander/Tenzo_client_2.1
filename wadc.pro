@@ -31,14 +31,18 @@ SOURCES += \
         mainwindow.cpp \
     qcustomplot.cpp \
     port.cpp \
-    myudp.cpp
+    myudp.cpp \
+    beamunitlib.cpp \
+    users_lang.cpp
 
 HEADERS += \
         mainwindow.h \
     qcustomplot.h \
     port.h \
     wadc_defines.h \
-    myudp.h
+    myudp.h \
+    beamunitlib.h \
+    users_lang.h
 
 FORMS += \
         mainwindow.ui

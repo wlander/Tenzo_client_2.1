@@ -28,6 +28,9 @@ public:
 
     Settings SettingsPort;
 
+    void set_num_data_recv(unsigned n){ num_data_recv = n; }
+
+
 signals:
 
     void finished_Port(); //
@@ -62,13 +65,17 @@ private slots:
 public:
 
 private:
+
     bool RecvEn = false;
     bool RegEn = false;
+    bool num_buf = false;
+    unsigned cnt_read_block = 0;
+    unsigned cnt_loop_block = 0;
+    unsigned num_data_recv = 1000;
+
     QByteArray buf1;
     QByteArray buf2;
-    bool num_buf = false;
-    int cnt_read_block = 0;
-    int cnt_loop_block = 0;
+
 };
 
 #endif // PORT_H

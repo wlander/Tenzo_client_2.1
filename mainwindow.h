@@ -58,14 +58,6 @@ private slots:
     void on_checkBox_clicked();
     void on_spinBox_2_valueChanged(const QString &arg1);
     void on_pushButton_2_clicked();
-    void on_lineEdit_14_returnPressed();
-    void on_lineEdit_15_returnPressed();
-    void on_lineEdit_12_returnPressed();
-    void on_lineEdit_13_returnPressed();
-    void on_lineEdit_13_editingFinished();
-    void on_lineEdit_12_editingFinished();
-    void on_lineEdit_15_editingFinished();
-    void on_lineEdit_14_editingFinished();
     void on_lineEdit_editingFinished();
     void on_checkBox_2_stateChanged(int arg1);
     void on_groupBox_clicked();
@@ -73,6 +65,7 @@ private slots:
 private:
     Ui::MainWindow *ui;
     void Write_byte_to_serial_port(char cb);
+    void  Write_byte_to_esp(char cb);
     int write_in_file(char *the_data, unsigned int the_size);
 };
 

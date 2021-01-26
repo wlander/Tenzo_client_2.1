@@ -1,26 +1,30 @@
 #include "port.h"
 #include <qdebug.h>
 
-extern volatile int cnt_byte_recv;
-extern volatile int num_data_recv;
-extern volatile int cnt_cdg_recv;
+//-----------------------------------------------------------------------------------------
 
 Port::Port(QObject *parent) :
     QObject(parent)
 {
 }
 
+//-----------------------------------------------------------------------------------------
+
 Port::~Port()
 {
-    qDebug("By in Thread!");
+    qDebug("By in Serial Port Thread !");
     emit finished_Port();
 }
 
+//-----------------------------------------------------------------------------------------
+
 void Port :: process_Port(void){
-    qDebug("Hello World in Thread!");
+    qDebug("Hello World in Serial Port Thread!");
     connect(&thisPort,SIGNAL(error(QSerialPort::SerialPortError)), this, SLOT(handleError(QSerialPort::SerialPortError)));
     connect(&thisPort, SIGNAL(readyRead()),this,SLOT(ReadInPort()));
 }
+
+//-----------------------------------------------------------------------------------------
 
 void Port :: Write_Settings_Port(QString name, int baudrate,int DataBits,
                          int Parity,int StopBits, int FlowControl){
@@ -33,6 +37,8 @@ void Port :: Write_Settings_Port(QString name, int baudrate,int DataBits,
 
 }
 
+//-----------------------------------------------------------------------------------------
+
 void Port :: ConnectPort(void){//
     thisPort.setPortName(SettingsPort.name);
     if (thisPort.open(QIODevice::ReadWrite)) {
@@ -43,7 +49,7 @@ void Port :: ConnectPort(void){//
                 && thisPort.setFlowControl(SettingsPort.flowControl))
         {
             if (thisPort.isOpen()){
-                error_((SettingsPort.name+ " >> Открыт!\r").toLocal8Bit());
+                error_((SettingsPort.name+ " >> Opened!\r").toLocal8Bit());
             }
         } else {
             thisPort.close();
@@ -56,6 +62,8 @@ void Port :: ConnectPort(void){//
     }
 }
 
+//-----------------------------------------------------------------------------------------
+
 void Port::handleError(QSerialPort::SerialPortError error)//
 {
     if ( (thisPort.isOpen()) && (error == QSerialPort::ResourceError)) {
@@ -64,29 +72,29 @@ void Port::handleError(QSerialPort::SerialPortError error)//
     }
 }//
 
+//-----------------------------------------------------------------------------------------
 
 void  Port::DisconnectPort(void){
     if(thisPort.isOpen()){
         thisPort.close();
-        error_(SettingsPort.name.toLocal8Bit() + " >> Закрыт!\r");
+        error_(SettingsPort.name.toLocal8Bit() + " >> Closed!\r");
     }
 }
-//ot tuta kovuratji!!!
+
+//-----------------------------------------------------------------------------------------
+
 void Port :: WriteToPort(QByteArray data){
     if(thisPort.isOpen()){
         thisPort.write(data);
     }
 }
 
+//-----------------------------------------------------------------------------------------
 
 void Port :: ReadInPort(void){
     int Cnt_Byte = 0;
     int Cnt_Block = 0;
-/*
-   if(thisPort.bytesAvailable() >= num_data_recv){
-       buf2.append(thisPort.read(num_data_recv));
-   }
-*/
+
    buf1.append(thisPort.readAll());
    Cnt_Byte = buf1.count();
    Cnt_Block = Cnt_Byte/(num_data_recv);
@@ -95,22 +103,32 @@ void Port :: ReadInPort(void){
        cnt_read_block++;
        cnt_loop_block++;
    }
+
    if(cnt_loop_block==1){
-       buf2.clear();
-       buf2.append(buf1.data()+(cnt_read_block-1)*num_data_recv, num_data_recv);
-       outPort(buf2);
+       if(RecvEn){
+         buf2.clear();
+         buf2.append(buf1.data()+(cnt_read_block-1)*num_data_recv, num_data_recv);
+         outPort(buf2);
+       }
+       else{
+          qDebug("Serial port buffer is busy!");
+       }
        cnt_loop_block = 0;
    }
 
 }
 
+//----------------------------------------------------------------------------------------
+
 void Port :: SetRunRecv(bool Recv_En){
    RecvEn = Recv_En;
 }
+//----------------------------------------------------------------------------------------
 void Port :: SetRunReg(bool Reg_En){
    RegEn = Reg_En;
 }
-
+//----------------------------------------------------------------------------------------
 void Port :: ClearBuf1(void){
    //reg_buf.clear();
 }
+//----------------------------------------------------------------------------------------
