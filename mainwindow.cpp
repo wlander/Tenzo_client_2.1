@@ -28,13 +28,17 @@ MainWindow::MainWindow(QWidget *parent) :
 
     //------------- The class is base of control and processing of data ---------------
     beamunitlib = new BeamUnitLib();//Создаем обьект по классу
-    u_lng = new Users_Lang();
-    u_lng->set_lang("ru");
+
+    beamunitlib->data_mng->fl_rcv_data_en = ui->checkBox_2->isChecked();
+    beamunitlib->data_mng->fl_rcv_control_en = ui->checkBox->isChecked();
 
     for(int i = 0; i < beamunitlib->data_mng->N_RCV; i++){
        x[i] = i;
        y[i] = -4.0+(double)i*(8.0/(double)beamunitlib->data_mng->N_RCV);
     }
+
+    u_lng = new Users_Lang();
+    u_lng->set_lang("ru");
 
     ui->Button_Start_Stop->setEnabled(false);
 
@@ -45,6 +49,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     ui->checkBox->setEnabled(false);
     ui->checkBox_2->setEnabled(false);
+    ui->pushButton_2->setEnabled(false);
 //----------- настройка QCustomPlot -----------------------------------------------
     ui->Plot1->addGraph();
     ui->Plot2->addGraph();
@@ -55,15 +60,15 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->Plot2_2->axisRect()->setRangeZoom(Qt::Horizontal);
 
     ui->Plot1->graph(0)->setData(x,y);
-    ui->Plot1->xAxis->setRange(0, beamunitlib->data_mng->N_RCV);
+    ui->Plot1->xAxis->setRange(1, beamunitlib->data_mng->N_RCV);
     ui->Plot1->yAxis->setRange(-2.0, 2.0);
 
     ui->Plot2->graph(0)->setData(x,y);
-    ui->Plot2->xAxis->setRange(0, beamunitlib->data_mng->N_RCV);
+    ui->Plot2->xAxis->setRange(1, beamunitlib->data_mng->N_RCV);
     ui->Plot2->yAxis->setRange(-2.0, 2.0);
 
     ui->Plot2_2->graph(0)->setData(x,y);
-    ui->Plot2_2->xAxis->setRange(0, beamunitlib->data_mng->N_RCV);
+    ui->Plot2_2->xAxis->setRange(1, beamunitlib->data_mng->N_RCV);
     ui->Plot2_2->yAxis->setRange(-2.0, 2.0);
 
     ui->Plot1->replot();
@@ -112,7 +117,7 @@ MainWindow::MainWindow(QWidget *parent) :
     if(beamunitlib->data_mng->Mode_UDP){
         MyUDP *udpc = new MyUDP();
         udpc->moveToThread(thread_New);
-        \
+
         connect(udpc,SIGNAL(outUDP(QByteArray)),this,SLOT(ReadFromPort(QByteArray)));
         connect(this,SIGNAL(writeData(QByteArray)),udpc,SLOT(UDPWrite(QByteArray)));
         connect(this,SIGNAL(SayHelloUDP()),udpc,SLOT(SayHello()));
@@ -166,14 +171,16 @@ if(!beamunitlib->data_mng->Mode_UDP){
 
         savesettings(ui->PortNameEdit->text(),COM_BaudRate,8,0,1,0);
         Connect_Port();
+        ui->Button_Connect->setEnabled(false);
+        QThread::msleep(1000);
+        ui->Button_Connect->setEnabled(true);
 
         ui->label_19->setText(u_lng->get_p(u_lng->Stoped));
         ui->label_19->setStyleSheet("font-weight: bold; font-size: 10pt; color: blue;");
 
-        for(i=0;i<1000000;i++){i=i;}
-
         ui->checkBox_2->setEnabled(true);
         ui->checkBox->setEnabled(true);
+        ui->pushButton_2->setEnabled(true);
 
     }else{
 
@@ -185,11 +192,13 @@ if(!beamunitlib->data_mng->Mode_UDP){
         ui->Button_Start_Stop->setEnabled(false);
         ui->label_19->setText(u_lng->get_p(u_lng->Disconnected));
         ui->label_19->setStyleSheet("font-weight: bold; font-size: 10pt; color: black;");
-
-        for(i=0;i<1000000;i++){i=i;}
-
+        ui->Button_Connect->setEnabled(false);
+        QThread::msleep(1000);
+        ui->Button_Connect->setEnabled(true);
         ui->checkBox_2->setEnabled(false);
         ui->checkBox->setEnabled(false);
+
+        beamunitlib->data_mng->Fl_SD_Ready = false;
     }
 
     Signal_SetRunRecv(beamunitlib->data_mng->Fl_Connect);
@@ -213,7 +222,7 @@ void MainWindow::on_Button_Start_Stop_clicked()
 
 //  Fl_SD_Ready = 1; //!!!
 
-if(beamunitlib->data_mng->Fl_SD_Ready){
+ if(beamunitlib->data_mng->Fl_SD_Ready){
 
     if(beamunitlib->data_mng->Fl_Start==false){
 
@@ -223,8 +232,8 @@ if(beamunitlib->data_mng->Fl_SD_Ready){
         ui->Button_Start_Stop->setText(u_lng->get_p(u_lng->Stop));
         ui->Button_Connect->setEnabled(false);
         ui->checkBox->setEnabled(false);
-
         Write_byte_to_serial_port(Conf_Byte_Start);
+
 
     }else{
 
@@ -235,7 +244,9 @@ if(beamunitlib->data_mng->Fl_SD_Ready){
 
         Write_byte_to_serial_port(Conf_Byte_Stop);
 
-        for(i=0;i<100000;i++){i=i;}
+        ui->Button_Start_Stop->setEnabled(false);
+        QThread::msleep(1000);
+        ui->Button_Start_Stop->setEnabled(true);
 
         ui->checkBox->setEnabled(true);
 
@@ -244,8 +255,11 @@ if(beamunitlib->data_mng->Fl_SD_Ready){
  else{
 
     Write_byte_to_esp(Power_SD_On);
-    for(i=0;i<100000;i++){i=i;}
-     //Fl_SD_Ready = true;
+    ui->Button_Start_Stop->setEnabled(false);
+    QThread::msleep(1000);
+    ui->Button_Start_Stop->setEnabled(true);
+    beamunitlib->data_mng->Fl_SD_Ready = true;
+    ui->pushButton_2->setEnabled(false);
  }
 
 }
@@ -262,16 +276,17 @@ void MainWindow::ReadFromPort(QByteArray data)
     QString str;
     double mx,mn;
     QVector<double> x(N_RCV_MAX), y(N_RCV_MAX);
-
     Signal_SetRunRecv(0);
+
+ beamunitlib->set_header(data.data());
 
  if((beamunitlib->cntrl_sd_ptr->stat[0]==3) && ui->checkBox->isChecked()){
 
     beamunitlib->Handler_unit(data.data(),data.count());
 
     ui->label_13->setText(u_lng->get_p(u_lng->Files_in_SD) + QString::number(beamunitlib->cntrl_sd_ptr->cnt_file_sd));
-    ui->label_9->setText(u_lng->get_p(u_lng->Samples_in_cur_file) + QString::number(((beamunitlib->cntrl_sd_ptr->cnt_status_write*512)/beamunitlib->data_mng->Num_Ch)/2));
-    ui->label->setText(u_lng->get_p(u_lng->Total_data_in_SD) + QString::number(beamunitlib->cntrl_sd_ptr->cnt_status_write_all));
+    ui->label_9->setText(u_lng->get_p(u_lng->Samples_in_cur_file) + QString::number(((beamunitlib->cntrl_sd_ptr->cnt_status_write_file*512)/beamunitlib->data_mng->Num_Ch)/2));
+    ui->label->setText(u_lng->get_p(u_lng->Total_data_in_SD) + QString::number(((beamunitlib->cntrl_sd_ptr->cnt_status_write*512)/beamunitlib->data_mng->Num_Ch)/2));
 
  //ЗДЕСЬ ЗАКОНЧИЛ!!!
 
@@ -280,8 +295,8 @@ void MainWindow::ReadFromPort(QByteArray data)
         //view_ch_1
         for(j=0;j<beamunitlib->data_mng->Num_Ch;j++){
 
-            mx = beamunitlib->data_mng->obr_buf_f[j][i];
-            mn = beamunitlib->data_mng->obr_buf_f[j][i];
+            mx = beamunitlib->data_mng->obr_buf_f[j][0];
+            mn = beamunitlib->data_mng->obr_buf_f[j][0];
             for(int i = 0; i < beamunitlib->data_mng->cnt_block_recv; i++){
                x[i] = i;
                y[i] = beamunitlib->data_mng->obr_buf_f[j][i];
@@ -506,7 +521,7 @@ void MainWindow::on_lineEdit_11_returnPressed()
 
         double Xm_1;
         double Xm_2;
-        Xm_1 = 0;
+        Xm_1 = 1;
         Xm_2 = ui->lineEdit_11->text().toDouble();
         if(Xm_2>N_RCV_MAX){
             Xm_2 = N_RCV_MAX;
@@ -557,7 +572,9 @@ void MainWindow::on_pushButton_2_clicked()
    data_cdg.append(RESET_WR_SD);
    writeData(data_cdg);
    data_cdg.clear();
-   for(i=0;i<100000;i++){i=i;}
+   QThread::msleep(1000);
+
+
 
 }
 
@@ -566,3 +583,8 @@ void MainWindow::closeEvent(QCloseEvent *event)
 
 }
 
+
+void MainWindow::on_checkBox_2_stateChanged(int arg1)
+{
+
+}

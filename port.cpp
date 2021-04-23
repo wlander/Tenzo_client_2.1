@@ -1,11 +1,12 @@
 #include "port.h"
 #include <qdebug.h>
-
+#include <QThread>
 //-----------------------------------------------------------------------------------------
 
 Port::Port(QObject *parent) :
     QObject(parent)
 {
+    RecvEn = true;
 }
 
 //-----------------------------------------------------------------------------------------
@@ -92,8 +93,8 @@ void Port :: WriteToPort(QByteArray data){
 //-----------------------------------------------------------------------------------------
 
 void Port :: ReadInPort(void){
-    int Cnt_Byte = 0;
-    int Cnt_Block = 0;
+   unsigned Cnt_Byte = 0;
+   unsigned Cnt_Block = 0;
 
    buf1.append(thisPort.readAll());
    Cnt_Byte = buf1.count();

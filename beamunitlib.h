@@ -14,14 +14,14 @@ signals:
 
 public slots:
     int Handler_unit(char*, int);
-
+    int set_header(char*);
 public:
 
     QByteArray buf_reg;
     data_managing* data_mng;
     cdg_control_sd* cntrl_sd_ptr;
 
-    const int num_data_recv = ((SIZE_DATA_CDG*2)+16);
+    unsigned num_data_recv;
 
 private:
 

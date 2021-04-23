@@ -9,7 +9,7 @@
 #define SPEED_MARK_ENC  0xFFFFFFFF
 #define SIZE_DATA_CDG 	30
 
-const int COM_BaudRate = 230400;
+const int COM_BaudRate = 115200;
 const char Conf_Byte_Start = 0x31;
 const char Conf_Byte_Stop = 0x30;
 const char Power_SD_On = 0x33;
@@ -66,12 +66,11 @@ typedef volatile struct
 
 typedef volatile struct
 {
-    uint32_t cnt_status_write;
-    uint32_t cnt_file_sd;
-    uint32_t cnt_status_write_all;
-    uint8_t stat[4];
-
-    uint16_t data[SIZE_DATA_CDG];
+    unsigned cnt_status_write;
+    unsigned cnt_file_sd;
+    unsigned cnt_status_write_file;
+    unsigned char stat[4];
+    unsigned short data[SIZE_DATA_CDG];
 
 }cdg_control_sd;
 

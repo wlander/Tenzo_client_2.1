@@ -40,7 +40,6 @@ private slots:
     void on_pushButton_5_clicked();
     void ReadFromPort(QByteArray);
 
-    void on_pushButton_4_clicked();
     void on_pushButton_6_clicked();
     void on_pushButton_7_clicked();
     void on_lineEdit_returnPressed();
@@ -55,12 +54,8 @@ private slots:
     void on_lineEdit_10_returnPressed();
     void on_lineEdit_11_returnPressed();
     void on_pushButton_9_clicked();
-    void on_checkBox_clicked();
-    void on_spinBox_2_valueChanged(const QString &arg1);
     void on_pushButton_2_clicked();
-    void on_lineEdit_editingFinished();
     void on_checkBox_2_stateChanged(int arg1);
-    void on_groupBox_clicked();
 
 private:
     Ui::MainWindow *ui;
