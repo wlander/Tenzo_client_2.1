@@ -1,5 +1,6 @@
 #ifndef WADC_DEFINES_H
 #define WADC_DEFINES_H
+#include <QString>
 
 //#define DEBUG_MODE
 
@@ -19,6 +20,8 @@ const char Conf_Byte_data_Off = 0x35;
 const char Conf_Byte_sig_On = 0x36;
 const char Conf_Byte_sig_Off = 0x37;
 const char Conf_Byte_Ask_Ok = 0x39;
+const char SD_Rec_Off = 0x41;
+const char SD_Rec_On = 0x42;
 const char Conf_Byte_Req_Data = 94;
 const char Conf_Byte_Pack_Mode_En = 28;
 const char Conf_Byte_Pack_Mode_Dis = 29;
@@ -32,6 +35,10 @@ const char Conf_Byte_Enc_On = 39;
 const char Conf_Byte_Enc_Off = 40;
 const char Conf_Byte_Enc_View_On = 41;
 const char Conf_Byte_Enc_View_Off = 42;
+
+#define MAX_STAT    8
+
+const QString SD_STAT[8] = {"ST_SD_OK", "ST_SD_ERR_GINF", "ST_SD_ERR_WR", "ST_SD_ERR_FULL", "_", "ST_SD_ERR_INIT", "ST_SD_ERR_RD0", "ST_SD_ERR_WR0"};
 
 
 typedef volatile struct

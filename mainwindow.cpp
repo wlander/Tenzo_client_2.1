@@ -9,6 +9,7 @@
 #include <unistd.h>
 #include <errno.h>
 #include <QThread>
+#include <qdebug.h>
 #include "beamunitlib.h"
 #include "wadc_defines.h"
 #include "myudp.h"
@@ -50,6 +51,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->checkBox->setEnabled(false);
     ui->checkBox_2->setEnabled(false);
     ui->pushButton_2->setEnabled(false);
+    ui->checkBox_3->setEnabled(false);
 //----------- настройка QCustomPlot -----------------------------------------------
     ui->Plot1->addGraph();
     ui->Plot2->addGraph();
@@ -181,6 +183,8 @@ if(!beamunitlib->data_mng->Mode_UDP){
         ui->checkBox_2->setEnabled(true);
         ui->checkBox->setEnabled(true);
         ui->pushButton_2->setEnabled(true);
+        ui->checkBox_3->setEnabled(true);
+
 
     }else{
 
@@ -260,7 +264,11 @@ void MainWindow::on_Button_Start_Stop_clicked()
     ui->Button_Start_Stop->setEnabled(true);
     beamunitlib->data_mng->Fl_SD_Ready = true;
     ui->pushButton_2->setEnabled(false);
+    ui->checkBox_3->setEnabled(false);
+
  }
+
+  ui->progressBar->setValue(0);
 
 }
 
@@ -284,11 +292,18 @@ void MainWindow::ReadFromPort(QByteArray data)
 
     beamunitlib->Handler_unit(data.data(),data.count());
 
-    ui->label_13->setText(u_lng->get_p(u_lng->Files_in_SD) + QString::number(beamunitlib->cntrl_sd_ptr->cnt_file_sd));
-    ui->label_9->setText(u_lng->get_p(u_lng->Samples_in_cur_file) + QString::number(((beamunitlib->cntrl_sd_ptr->cnt_status_write_file*512)/beamunitlib->data_mng->Num_Ch)/2));
-    ui->label->setText(u_lng->get_p(u_lng->Total_data_in_SD) + QString::number(((beamunitlib->cntrl_sd_ptr->cnt_status_write*512)/beamunitlib->data_mng->Num_Ch)/2));
+    if(!ui->checkBox_3->isChecked()){
+        ui->label_13->setText(u_lng->get_p(u_lng->Files_in_SD) + QString::number(beamunitlib->cntrl_sd_ptr->cnt_file_sd));
+        ui->label_9->setText(u_lng->get_p(u_lng->Samples_in_cur_file) + QString::number(((beamunitlib->cntrl_sd_ptr->cnt_status_write_file*512)/beamunitlib->data_mng->Num_Ch)/2));
+        ui->label->setText(u_lng->get_p(u_lng->Total_data_in_SD) + QString::number(((beamunitlib->cntrl_sd_ptr->cnt_status_write*512)/beamunitlib->data_mng->Num_Ch)/2));
+    }
+    else{
+        ui->label_13->setText(u_lng->get_p(u_lng->Files_in_SD));
+        ui->label_9->setText(u_lng->get_p(u_lng->Samples_in_cur_file));
+        ui->label->setText(u_lng->get_p(u_lng->Total_data_in_SD));
+    }
 
- //ЗДЕСЬ ЗАКОНЧИЛ!!!
+    ui->progressBar->setValue((beamunitlib->data_mng->cnt_block_recv*100)/beamunitlib->data_mng->N_RCV);
 
     if((beamunitlib->data_mng->cnt_block_recv >= beamunitlib->data_mng->N_RCV) && (ui->checkBox_2->isChecked())){
 
@@ -320,6 +335,7 @@ void MainWindow::ReadFromPort(QByteArray data)
                 ui->Plot2_2->replot();
             }
 
+            ui->progressBar->setValue(0);
         }
 
         beamunitlib->data_mng->cnt_block_recv = 0;
@@ -334,6 +350,7 @@ void MainWindow::ReadFromPort(QByteArray data)
     }
 
   }
+
   else if(beamunitlib->cntrl_sd_ptr->stat[0]==1){
      ui->Button_Start_Stop->setText(u_lng->get_p(u_lng->Write));
      ui->label_2->setText(u_lng->get_p(u_lng->SD_not_activated));
@@ -354,7 +371,10 @@ void MainWindow::ReadFromPort(QByteArray data)
     ui->label_19->setText(u_lng->get_p(u_lng->Connection_OK));
   }
 
-    Signal_SetRunRecv(1);
+  if(ui->checkBox_3->isChecked()) ui->label_2->setText(u_lng->get_p(u_lng->SD_Rec_Off));
+  if(beamunitlib->cntrl_sd_ptr->stat[1]<MAX_STAT-1) ui->lbl_stat_sd->setText(SD_STAT[beamunitlib->cntrl_sd_ptr->stat[1]]);
+  //if((beamunitlib->cntrl_sd_ptr->stat[0]==0)
+  Signal_SetRunRecv(1);
 
 }
 
@@ -364,6 +384,8 @@ void MainWindow::on_pushButton_7_clicked()
     //Fl_0_Before = 1;
     ui->pushButton_2->setEnabled(false);
     ui->pushButton_7->setEnabled(false);
+    ui->checkBox_3->setEnabled(false);
+
 }
 
 void MainWindow::on_lineEdit_returnPressed()
@@ -567,7 +589,6 @@ void MainWindow::on_pushButton_6_clicked()
 void MainWindow::on_pushButton_2_clicked()
 {
    QByteArray data_cdg;
-   int i;
 
    data_cdg.append(RESET_WR_SD);
    writeData(data_cdg);
@@ -587,4 +608,16 @@ void MainWindow::closeEvent(QCloseEvent *event)
 void MainWindow::on_checkBox_2_stateChanged(int arg1)
 {
 
+}
+
+void MainWindow::on_checkBox_3_stateChanged(int arg1)
+{
+    QByteArray data_cdg;
+
+    if(ui->checkBox_3->isChecked()) data_cdg.append(SD_Rec_Off);
+    else data_cdg.append(SD_Rec_On);
+    writeData(data_cdg);
+    data_cdg.clear();
+    QThread::msleep(1000);
+    qDebug((QString::number(ui->checkBox_3->isChecked())).toStdString().c_str());
 }

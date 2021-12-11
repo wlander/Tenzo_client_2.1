@@ -14,6 +14,7 @@ public:
         Stoped,
         Asked_connection,
         Connection_OK,
+        SD_Rec_Off,
         SD_not_activated,
         SD_activated,
         SD_writing_stoped,
@@ -45,12 +46,12 @@ public slots:
 
 public:
 
-const QString lang_ru[Max_lng_usr] = {"Отключено!", "Остановлено!", "Связь  - ?", "Связь - ОК",
+const QString lang_ru[Max_lng_usr] = {"Отключено!", "Остановлено!", "Связь  - ?", "Связь - ОК", "Запись на SD отключена!",
         "SD не активирована!", "SD активирована!", "Запись на SD остановлена!", "Запись на SD запущена!", "Подключить",
         "Отключить", "Проверка связи", "Старт", "Стоп", "Запись", "Файлов на SD: ", "Сэмплов в тек. файле: ", "Всего сэмплов на SD: ",
         "Очистить SD", "Авто", "Сигнал", "Контроль"};
 
-const QString lang_en[Max_lng_usr] = {"Disconnected!", "Stoped!", "Connection  - ?", "Connection - OK",
+const QString lang_en[Max_lng_usr] = {"Disconnected!", "Stoped!", "Connection  - ?", "Connection - OK", "SD recording is Off!",
         "SD not activated!", "SD activated!", "SD writing stoped!", "SD writing running", "Connect",
         "Disconnect", "Check connection", "Start", "Stop", "Write", "Files in SD: ", "Samples in cur file: ", "Total data in SD: ",
         "Clear SD", "Auto", "Signal", "Control"};
